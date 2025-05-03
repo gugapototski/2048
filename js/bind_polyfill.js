@@ -1,6 +1,6 @@
-Function.prototype.bind = Function.prototype.bind || function (target) {
+Function.prototype.bind = Function.prototype.bind || function polyfillBind(target) {
   var self = this;
-  return function (args) {
+  return function boundFunction(args) {
     if (!(args instanceof Array)) {
       args = [args];
     }
