@@ -90,7 +90,7 @@
 <div class="container">
   <div class="row">
     <textarea id="file-source" class="col-md-12">// Wait till the browser is ready to render the game (avoids glitches)
-window.requestAnimationFrame(function () {
+window.requestAnimationFrame(function startGame() {
   new GameManager(4, KeyboardInputManager, HTMLActuator, LocalStorageManager);
 });</textarea>
   </div>

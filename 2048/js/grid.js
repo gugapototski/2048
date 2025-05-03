@@ -4,7 +4,7 @@ function Grid(size, previousState) {
 }
 
 // Build a grid of the specified size
-Grid.prototype.empty = function () {
+Grid.prototype.empty = function empty() {
   var cells = [];
 
   for (var x = 0; x < this.size; x++) {
@@ -18,7 +18,7 @@ Grid.prototype.empty = function () {
   return cells;
 };
 
-Grid.prototype.fromState = function (state) {
+Grid.prototype.fromState = function fromState(state) {
   var cells = [];
 
   for (var x = 0; x < this.size; x++) {
@@ -34,7 +34,7 @@ Grid.prototype.fromState = function (state) {
 };
 
 // Find the first available random position
-Grid.prototype.randomAvailableCell = function () {
+Grid.prototype.randomAvailableCell = function randomAvailableCell() {
   var cells = this.availableCells();
 
   if (cells.length) {
@@ -42,10 +42,10 @@ Grid.prototype.randomAvailableCell = function () {
   }
 };
 
-Grid.prototype.availableCells = function () {
+Grid.prototype.availableCells = function availableCells() {
   var cells = [];
 
-  this.eachCell(function (x, y, tile) {
+  this.eachCell(function collectEmptyCells(x, y, tile) {
     if (!tile) {
       cells.push({ x: x, y: y });
     }
@@ -55,7 +55,7 @@ Grid.prototype.availableCells = function () {
 };
 
 // Call callback for every cell
-Grid.prototype.eachCell = function (callback) {
+Grid.prototype.eachCell = function eachCell(callback) {
   for (var x = 0; x < this.size; x++) {
     for (var y = 0; y < this.size; y++) {
       callback(x, y, this.cells[x][y]);
@@ -64,20 +64,20 @@ Grid.prototype.eachCell = function (callback) {
 };
 
 // Check if there are any cells available
-Grid.prototype.cellsAvailable = function () {
+Grid.prototype.cellsAvailable = function cellsAvailable() {
   return !!this.availableCells().length;
 };
 
 // Check if the specified cell is taken
-Grid.prototype.cellAvailable = function (cell) {
+Grid.prototype.cellAvailable = function cellAvailable(cell) {
   return !this.cellOccupied(cell);
 };
 
-Grid.prototype.cellOccupied = function (cell) {
+Grid.prototype.cellOccupied = function cellOccupied(cell) {
   return !!this.cellContent(cell);
 };
 
-Grid.prototype.cellContent = function (cell) {
+Grid.prototype.cellContent = function cellContent(cell) {
   if (this.withinBounds(cell)) {
     return this.cells[cell.x][cell.y];
   } else {
@@ -86,20 +86,20 @@ Grid.prototype.cellContent = function (cell) {
 };
 
 // Inserts a tile at its position
-Grid.prototype.insertTile = function (tile) {
+Grid.prototype.insertTile = function insertTile(tile) {
   this.cells[tile.x][tile.y] = tile;
 };
 
-Grid.prototype.removeTile = function (tile) {
+Grid.prototype.removeTile = function removeTile(tile) {
   this.cells[tile.x][tile.y] = null;
 };
 
-Grid.prototype.withinBounds = function (position) {
+Grid.prototype.withinBounds = function withinBounds(position) {
   return position.x >= 0 && position.x < this.size &&
          position.y >= 0 && position.y < this.size;
 };
 
-Grid.prototype.serialize = function () {
+Grid.prototype.serialize = function serialize() {
   var cellState = [];
 
   for (var x = 0; x < this.size; x++) {
