@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">66.68</p>
+      <p class="stat">66.70</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">144</p>
+      <p class="stat">142</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">30.48</p>
+      <p class="stat">29.26</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">1.28</p>
+      <p class="stat">1.29</p>
     </div>
   </div>
 </div>
@@ -93,7 +93,7 @@
   this.events = {};
 
   if (window.navigator.msPointerEnabled) {
-    //Internet Explorer 10 style
+    // Internet Explorer 10 style
     this.eventTouchstart    = &quot;MSPointerDown&quot;;
     this.eventTouchmove     = &quot;MSPointerMove&quot;;
     this.eventTouchend      = &quot;MSPointerUp&quot;;
@@ -106,23 +106,23 @@
   this.listen();
 }
 
-KeyboardInputManager.prototype.on = function (event, callback) {
+KeyboardInputManager.prototype.on = function on(event, callback) {
   if (!this.events[event]) {
     this.events[event] = [];
   }
   this.events[event].push(callback);
 };
 
-KeyboardInputManager.prototype.emit = function (event, data) {
+KeyboardInputManager.prototype.emit = function emit(event, data) {
   var callbacks = this.events[event];
   if (callbacks) {
-    callbacks.forEach(function (callback) {
+    callbacks.forEach(function callCallback(callback) {
       callback(data);
     });
   }
 };
 
-KeyboardInputManager.prototype.listen = function () {
+KeyboardInputManager.prototype.listen = function listen() {
   var self = this;
 
   var map = {
@@ -141,9 +141,8 @@ KeyboardInputManager.prototype.listen = function () {
   };
 
   // Respond to direction keys
-  document.addEventListener(&quot;keydown&quot;, function (event) {
-    var modifiers = event.altKey || event.ctrlKey || event.metaKey ||
-                    event.shiftKey;
+  document.addEventListener(&quot;keydown&quot;, function handleKeydown(event) {
+    var modifiers = event.altKey || event.ctrlKey || event.metaKey || event.shiftKey;
     var mapped    = map[event.which];
 
     if (!modifiers) {
@@ -168,7 +167,7 @@ KeyboardInputManager.prototype.listen = function () {
   var touchStartClientX, touchStartClientY;
   var gameContainer = document.getElementsByClassName(&quot;game-container&quot;)[0];
 
-  gameContainer.addEventListener(this.eventTouchstart, function (event) {
+  gameContainer.addEventListener(this.eventTouchstart, function handleTouchStart(event) {
     if ((!window.navigator.msPointerEnabled &amp;&amp; event.touches.length &gt; 1) ||
         event.targetTouches.length &gt; 1) {
       return; // Ignore if touching with more than 1 finger
@@ -185,11 +184,11 @@ KeyboardInputManager.prototype.listen = function () {
     event.preventDefault();
   });
 
-  gameContainer.addEventListener(this.eventTouchmove, function (event) {
+  gameContainer.addEventListener(this.eventTouchmove, function handleTouchMove(event) {
     event.preventDefault();
   });
 
-  gameContainer.addEventListener(this.eventTouchend, function (event) {
+  gameContainer.addEventListener(this.eventTouchend, function handleTouchEnd(event) {
     if ((!window.navigator.msPointerEnabled &amp;&amp; event.touches.length &gt; 0) ||
         event.targetTouches.length &gt; 0) {
       return; // Ignore if still touching with one or more fingers
@@ -212,23 +211,22 @@ KeyboardInputManager.prototype.listen = function () {
     var absDy = Math.abs(dy);
 
     if (Math.max(absDx, absDy) &gt; 10) {
-      // (right : left) : (down : up)
       self.emit(&quot;move&quot;, absDx &gt; absDy ? (dx &gt; 0 ? 1 : 3) : (dy &gt; 0 ? 2 : 0));
     }
   });
 };
 
-KeyboardInputManager.prototype.restart = function (event) {
+KeyboardInputManager.prototype.restart = function restart(event) {
   event.preventDefault();
   this.emit(&quot;restart&quot;);
 };
 
-KeyboardInputManager.prototype.keepPlaying = function (event) {
+KeyboardInputManager.prototype.keepPlaying = function keepPlaying(event) {
   event.preventDefault();
   this.emit(&quot;keepPlaying&quot;);
 };
 
-KeyboardInputManager.prototype.bindButtonPress = function (selector, fn) {
+KeyboardInputManager.prototype.bindButtonPress = function bindButtonPress(selector, fn) {
   var button = document.querySelector(selector);
   button.addEventListener(&quot;click&quot;, fn.bind(this));
   button.addEventListener(this.eventTouchend, fn.bind(this));

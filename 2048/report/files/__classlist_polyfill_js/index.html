@@ -44,7 +44,7 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">71.12</p>
+      <p class="stat">71.16</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">37.06</p>
+      <p class="stat">35.48</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">0.55</p>
+      <p class="stat">0.56</p>
     </div>
   </div>
 </div>
@@ -89,7 +89,7 @@
 
 <div class="container">
   <div class="row">
-    <textarea id="file-source" class="col-md-12">(function () {
+    <textarea id="file-source" class="col-md-12">(function classListPolyfill() {
   if (typeof window.Element === &quot;undefined&quot; ||
       &quot;classList&quot; in document.documentElement) {
     return;
@@ -111,18 +111,18 @@
   }
 
   DOMTokenList.prototype = {
-    add: function (token) {
+    add: function add(token) {
       if (this.contains(token)) return;
       push.call(this, token);
       this.el.className = this.toString();
     },
-    contains: function (token) {
+    contains: function contains(token) {
       return this.el.className.indexOf(token) != -1;
     },
-    item: function (index) {
+    item: function item(index) {
       return this[index] || null;
     },
-    remove: function (token) {
+    remove: function remove(token) {
       if (!this.contains(token)) return;
       for (var i = 0; i &lt; this.length; i++) {
         if (this[i] == token) break;
@@ -130,10 +130,10 @@
       splice.call(this, i, 1);
       this.el.className = this.toString();
     },
-    toString: function () {
+    toString: function toStringOverride() {
       return join.call(this, &#039; &#039;);
     },
-    toggle: function (token) {
+    toggle: function toggle(token) {
       if (!this.contains(token)) {
         this.add(token);
       } else {
@@ -156,7 +156,7 @@
     }
   }
 
-  defineElementGetter(HTMLElement.prototype, &#039;classList&#039;, function () {
+  defineElementGetter(HTMLElement.prototype, &#039;classList&#039;, function classListGetter() {
     return new DOMTokenList(this);
   });
 })();</textarea>
