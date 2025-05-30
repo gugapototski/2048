@@ -13,6 +13,8 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.setup();
 }
 
+GameManager.prototype.WINNING_TILE = 2048;
+
 // Restart the game
 GameManager.prototype.restart = function restartGame() {
   this.storageManager.clearGameState();
@@ -32,20 +34,27 @@ GameManager.prototype.isGameTerminated = function isGameTerminated() {
 };
 
 // Set up the game
-GameManager.prototype.setup = function setupGame() {
+GameManager.prototype.setup = function () {
   var previousState = this.storageManager.getGameState();
+  var wasSavedGame = previousState !== null;
 
-  if (previousState) {
-    this.grid        = new Grid(previousState.grid.size, previousState.grid.cells);
-    this.score       = previousState.score;
-    this.over        = previousState.over;
-    this.won         = previousState.won;
-    this.keepPlaying = previousState.keepPlaying;
+  if (wasSavedGame) {
+    var savedGrid = previousState.grid;
+    var savedScore = previousState.score;
+    var gameOver = previousState.over;
+    var gameWon = previousState.won;
+    var shouldKeepPlaying = previousState.keepPlaying;
+
+    this.grid = new Grid(savedGrid.size, savedGrid.cells);
+    this.score = savedScore;
+    this.over = gameOver;
+    this.won = gameWon;
+    this.keepPlaying = shouldKeepPlaying;
   } else {
-    this.grid        = new Grid(this.size);
-    this.score       = 0;
-    this.over        = false;
-    this.won         = false;
+    this.grid = new Grid(this.size);
+    this.score = 0;
+    this.over = false;
+    this.won = false;
     this.keepPlaying = false;
 
     this.addStartTiles();
@@ -53,6 +62,7 @@ GameManager.prototype.setup = function setupGame() {
 
   this.actuate();
 };
+
 
 // Set up the initial tiles to start the game with
 GameManager.prototype.addStartTiles = function addStartTiles() {
@@ -121,40 +131,27 @@ GameManager.prototype.moveTile = function moveTile(tile, cell) {
 };
 
 // Move tiles on the grid in the specified direction
-GameManager.prototype.move = function move(direction) {
+GameManager.prototype.move = function (direction) {
   var self = this;
 
   if (this.isGameTerminated()) return;
 
-  var cell, tile;
-
-  var vector     = this.getVector(direction);
-  var traversals = this.buildTraversals(vector);
-  var moved      = false;
+  var traversals = this.buildTraversals(this.getVector(direction));
+  var moved = false;
 
   this.prepareTiles();
 
-  traversals.x.forEach(function traverseX(x) {
-    traversals.y.forEach(function traverseY(y) {
-      cell = { x: x, y: y };
-      tile = self.grid.cellContent(cell);
+  traversals.x.forEach(function (x) {
+    traversals.y.forEach(function (y) {
+      var cell = { x: x, y: y };
+      var tile = self.grid.cellContent(cell);
 
       if (tile) {
-        var positions = self.findFarthestPosition(cell, vector);
-        var next      = self.grid.cellContent(positions.next);
+        var positions = self.findFarthestPosition(cell, self.getVector(direction));
+        var next = self.grid.cellContent(positions.next);
 
-        if (next && next.value === tile.value && !next.mergedFrom) {
-          var merged = new Tile(positions.next, tile.value * 2);
-          merged.mergedFrom = [tile, next];
-
-          self.grid.insertTile(merged);
-          self.grid.removeTile(tile);
-
-          tile.updatePosition(positions.next);
-
-          self.score += merged.value;
-
-          if (merged.value === 2048) self.won = true;
+        if (self.canMerge(tile, next)) {
+          self.mergeTiles(tile, next, positions.next);
         } else {
           self.moveTile(tile, positions.farthest);
         }
@@ -175,6 +172,23 @@ GameManager.prototype.move = function move(direction) {
 
     this.actuate();
   }
+};
+
+// Novos métodos extraídos
+GameManager.prototype.canMerge = function (tile, next) {
+  return next && next.value === tile.value && !next.mergedFrom;
+};
+
+GameManager.prototype.mergeTiles = function (tile, next, position) {
+  var merged = new Tile(position, tile.value * 2);
+  merged.mergedFrom = [tile, next];
+
+  this.grid.insertTile(merged);
+  this.grid.removeTile(tile);
+  tile.updatePosition(position);
+  this.score += merged.value;
+
+  if (merged.value === this.WINNING_TILE) this.won = true;
 };
 
 // Get the vector representing the chosen direction
