@@ -13,6 +13,13 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.setup();
 }
 
+
+// Definições de constantes logo abaixo (fora de qualquer método):
+GameManager.DIRECTION_UP    = 0;
+GameManager.DIRECTION_RIGHT = 1;
+GameManager.DIRECTION_DOWN  = 2;
+GameManager.DIRECTION_LEFT  = 3;
+
 GameManager.prototype.WINNING_TILE = 2048;
 
 // Restart the game
@@ -191,18 +198,28 @@ GameManager.prototype.mergeTiles = function (tile, next, position) {
   if (merged.value === this.WINNING_TILE) this.won = true;
 };
 
+// GameManager.prototype.getVector = function getVector(direction) {
+//   var map = {
+//     0: { x: 0,  y: -1 },
+//     1: { x: 1,  y: 0 },
+//     2: { x: 0,  y: 1 },
+//     3: { x: -1, y: 0 }
+//   };
+
+//   return map[direction];
+// };
+
 // Get the vector representing the chosen direction
 GameManager.prototype.getVector = function getVector(direction) {
-  var map = {
-    0: { x: 0,  y: -1 },
-    1: { x: 1,  y: 0 },
-    2: { x: 0,  y: 1 },
-    3: { x: -1, y: 0 }
-  };
+  // (Opcional: usar um array em vez de objeto, já que as chaves são 0..3)
+  var map = [];
+  map[GameManager.DIRECTION_UP]    = { x: 0,  y: -1 };
+  map[GameManager.DIRECTION_RIGHT] = { x: 1,  y: 0 };
+  map[GameManager.DIRECTION_DOWN]  = { x: 0,  y: 1 };
+  map[GameManager.DIRECTION_LEFT]  = { x: -1, y: 0 };
 
   return map[direction];
 };
-
 // Build a list of positions to traverse in the right order
 GameManager.prototype.buildTraversals = function buildTraversals(vector) {
   var traversals = { x: [], y: [] };
