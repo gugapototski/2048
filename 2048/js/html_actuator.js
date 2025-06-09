@@ -1,10 +1,11 @@
-function HTMLActuator() {
+function HTMLActuator(gridSize) {
   this.tileContainer    = document.querySelector(".tile-container");
   this.scoreContainer   = document.querySelector(".score-container");
   this.bestContainer    = document.querySelector(".best-container");
   this.messageContainer = document.querySelector(".game-message");
 
   this.score = 0;
+  this.gridSize = gridSize || 4;
 }
 
 HTMLActuator.prototype.actuate = function actuate(grid, metadata) {
@@ -50,11 +51,12 @@ HTMLActuator.prototype.clearContainer = function clearContainer(container) {
 
 //   var wrapper   = document.createElement("div");
 //   var inner     = document.createElement("div");
-//   var position  = tile.previousPosition || { x: tile.x, y: tile.y };
-//   var positionClass = this.positionClass(position);
 
-//   var classes = ["tile", "tile-" + tile.value, positionClass];
+//   // Posição atual ou anterior, para animar corretamente
+//   var position = tile.previousPosition || { x: tile.x, y: tile.y };
 
+//   // Aplica classes básicas
+//   var classes = ["tile", "tile-" + tile.value];
 //   if (tile.value > 2048) classes.push("tile-super");
 
 //   this.applyClasses(wrapper, classes);
@@ -85,76 +87,102 @@ HTMLActuator.prototype.clearContainer = function clearContainer(container) {
 
 // html_actuator.js (com métodos auxiliares extraídos)
 
-HTMLActuator.prototype.addTile = function addTile(tile) {
-  // 1. Crio o elemento “wrapper” + “inner” + classes iniciais
-  var wrapper = this.createTileWrapper(tile);
 
-  // 2. Anexo o texto/número ao inner
-  var inner = this.createTileInner(tile.value);
-  wrapper.appendChild(inner);
+//   // Posiciona o tile dinamicamente (removendo dependência de classes CSS fixas)
+//   this.setPosition(wrapper, position);
 
-  // 3. Decido que tipo de animação/fase será aplicada
-  if (tile.previousPosition) {
-    this.animateTileMovement(wrapper, tile);
-  } else if (tile.mergedFrom) {
-    this.animateTileMerge(wrapper, tile);
-  } else {
-    this.animateNewTile(wrapper);
-  }
+//   if (tile.previousPosition) {
+//     // Animação para mover tile da posição anterior para a atual
+//     window.requestAnimationFrame(function () {
+//       self.setPosition(wrapper, { x: tile.x, y: tile.y });
+//     });
+//   } else if (tile.mergedFrom) {
+//     classes.push("tile-merged");
+//     this.applyClasses(wrapper, classes);
 
-  // 4. Insiro no DOM
-  this.tileContainer.appendChild(wrapper);
-};
+//     tile.mergedFrom.forEach(function (merged) {
+//       self.addTile(merged);
+//     });
 
-// Cria o elemento “div.tile” com classes iniciais
-HTMLActuator.prototype.createTileWrapper = function createTileWrapper(tile) {
-  var wrapper = document.createElement("div");
-  var position = tile.previousPosition || { x: tile.x, y: tile.y };
-  var positionClass = this.positionClass(position);
+//   } else {
+//     this.animateNewTile(wrapper);
+//   }
 
-  var classes = ["tile", "tile-" + tile.value, positionClass];
-  if (tile.value > 2048) {
-    classes.push("tile-super");
-  }
-  this.applyClasses(wrapper, classes);
-  return wrapper;
-};
+//   // 4. Insiro no DOM
+//   this.tileContainer.appendChild(wrapper);
+// };
 
-// Cria o <div class="tile-inner"> com o valor dentro
-HTMLActuator.prototype.createTileInner = function createTileInner(value) {
-  var inner = document.createElement("div");
-  inner.classList.add("tile-inner");
-  inner.textContent = value;
-  return inner;
-};
+// <<<<<<< main
+// // Cria o elemento “div.tile” com classes iniciais
+// HTMLActuator.prototype.createTileWrapper = function createTileWrapper(tile) {
+//   var wrapper = document.createElement("div");
+//   var position = tile.previousPosition || { x: tile.x, y: tile.y };
+//   var positionClass = this.positionClass(position);
 
-// Animação ao mover um tile existente
-HTMLActuator.prototype.animateTileMovement = function animateTileMovement(wrapper, tile) {
-  var self = this;
-  // usa requestAnimationFrame para reposicionar a classe de posição
-  window.requestAnimationFrame(function () {
-    var newPositionClass = self.positionClass({ x: tile.x, y: tile.y });
-    // substitui a classe de posição antiga
-    wrapper.className = wrapper.className.replace(/\btile-position-\d-\d\b/, newPositionClass);
-  });
-};
+//   var classes = ["tile", "tile-" + tile.value, positionClass];
+//   if (tile.value > 2048) {
+//     classes.push("tile-super");
+//   }
+//   this.applyClasses(wrapper, classes);
+//   return wrapper;
+// };
 
-// Animação ao mesclar tiles: adiciona a classe “tile-merged” e chama recursivamente
-HTMLActuator.prototype.animateTileMerge = function animateTileMerge(wrapper, tile) {
-  // adiciona a classe que aplica efeito de mesclagem
-  wrapper.classList.add("tile-merged");
-  var self = this;
-  // para cada tile que originou a mesclagem, renderiza-o também
-  tile.mergedFrom.forEach(function (merged) {
-    self.addTile(merged);
-  });
-};
+// // Cria o <div class="tile-inner"> com o valor dentro
+// HTMLActuator.prototype.createTileInner = function createTileInner(value) {
+//   var inner = document.createElement("div");
+//   inner.classList.add("tile-inner");
+//   inner.textContent = value;
+//   return inner;
+// };
 
-// Animação ao criar um tile novo: adiciona classe “tile-new”
-HTMLActuator.prototype.animateNewTile = function animateNewTile(wrapper) {
-  wrapper.classList.add("tile-new");
-};
+// // Animação ao mover um tile existente
+// HTMLActuator.prototype.animateTileMovement = function animateTileMovement(wrapper, tile) {
+//   var self = this;
+//   // usa requestAnimationFrame para reposicionar a classe de posição
+//   window.requestAnimationFrame(function () {
+//     var newPositionClass = self.positionClass({ x: tile.x, y: tile.y });
+//     // substitui a classe de posição antiga
+//     wrapper.className = wrapper.className.replace(/\btile-position-\d-\d\b/, newPositionClass);
+//   });
+// };
 
+// // Animação ao mesclar tiles: adiciona a classe “tile-merged” e chama recursivamente
+// HTMLActuator.prototype.animateTileMerge = function animateTileMerge(wrapper, tile) {
+//   // adiciona a classe que aplica efeito de mesclagem
+//   wrapper.classList.add("tile-merged");
+//   var self = this;
+//   // para cada tile que originou a mesclagem, renderiza-o também
+//   tile.mergedFrom.forEach(function (merged) {
+//     self.addTile(merged);
+//   });
+// };
+
+// // Animação ao criar um tile novo: adiciona classe “tile-new”
+// HTMLActuator.prototype.animateNewTile = function animateNewTile(wrapper) {
+//   wrapper.classList.add("tile-new");
+// };
+
+
+// =======
+// HTMLActuator.prototype.setPosition = function(element, position) {
+//   // Ajuste para posição baseada em 1 (como no seu código original)
+//   var x = position.x - 0;
+//   var y = position.y - 0;
+
+//   // Cálculo do tamanho e gap (exemplo baseado no seu CSS atual)
+//   var totalWidth = 470;
+//   var gap = 15;
+
+//   // Pegue o tamanho da grade (coloque o valor dinâmico conforme precisar)
+//   var gridSize = this.gridSize;
+
+//   var cellSize = (totalWidth - gap * (gridSize - 1)) / gridSize;
+
+//   var translateX = x * (cellSize + gap);
+//   var translateY = y * (cellSize + gap);
+
+//   element.style.transform = "translate(" + translateX + "px, " + translateY + "px)";
+// };
 
 HTMLActuator.prototype.applyClasses = function applyClasses(element, classes) {
   element.setAttribute("class", classes.join(" "));
