@@ -1,4 +1,37 @@
 @import url(fonts/clear-sans.css);
+/* == GRID DINÂMICA dentro de .game-container == */
+.game-container .grid-container {
+  position: absolute;
+  top: 0; left: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--grid-size), var(--tile-size));
+  grid-template-rows:    repeat(var(--grid-size), var(--tile-size));
+  gap: var(--grid-gap);
+  width: calc(
+    var(--tile-size) * var(--grid-size)
+    + var(--grid-gap) * (var(--grid-size) - 1)
+  );
+  height: calc(
+    var(--tile-size) * var(--grid-size)
+    + var(--grid-gap) * (var(--grid-size) - 1)
+  );
+  z-index: 1;
+}
+
+/* ← ESTILO DOS “QUADRADINHOS” DE FUNDO ↓ */
+.game-container .grid-container .grid-cell {
+  background: rgba(238, 228, 218, 0.35);
+  border-radius: 3px;
+}
+
+.game-container .tile-container {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 2;
+}
+
+
 html, body {
   margin: 0;
   padding: 0;
@@ -201,7 +234,7 @@ hr {
     .game-container .game-message.game-won, .game-container .game-message.game-over {
       display: block; }
 
-.grid-container {
+/* .grid-container {
   position: absolute;
   z-index: 1; }
 
@@ -222,7 +255,7 @@ hr {
   border-radius: 3px;
   background: rgba(238, 228, 218, 0.35); }
   .grid-cell:last-child {
-    margin-right: 0; }
+    margin-right: 0; } */
 
 .tile-container {
   position: absolute;
