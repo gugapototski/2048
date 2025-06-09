@@ -49,37 +49,41 @@ KeyboardInputManager.prototype.listen = function listen() {
     65: 3  // A
   };
 
-  // Respond to direction keys
+  // Captura de teclas
   document.addEventListener("keydown", function handleKeydown(event) {
     var modifiers = event.altKey || event.ctrlKey || event.metaKey || event.shiftKey;
     var mapped    = map[event.which];
 
-    if (!modifiers) {
-      if (mapped !== undefined) {
-        event.preventDefault();
-        self.emit("move", mapped);
-      }
+    if (!modifiers && mapped !== undefined) {
+      event.preventDefault();
+
+      // Lê estado do checkbox
+      var invert = document.getElementById('invert-controls').checked;
+      // Inverte se necessário
+      var dir = invert ? (mapped ^ 2) : mapped;
+
+      self.emit("move", dir);
     }
 
-    // R key restarts the game
+    // R reinicia o jogo
     if (!modifiers && event.which === 82) {
       self.restart.call(self, event);
     }
   });
 
-  // Respond to button presses
+  // Botões de UI
   this.bindButtonPress(".retry-button", this.restart);
   this.bindButtonPress(".restart-button", this.restart);
   this.bindButtonPress(".keep-playing-button", this.keepPlaying);
 
-  // Respond to swipe events
+  // Swipe / toque
   var touchStartClientX, touchStartClientY;
   var gameContainer = document.getElementsByClassName("game-container")[0];
 
   gameContainer.addEventListener(this.eventTouchstart, function handleTouchStart(event) {
     if ((!window.navigator.msPointerEnabled && event.touches.length > 1) ||
         event.targetTouches.length > 1) {
-      return; // Ignore if touching with more than 1 finger
+      return;
     }
 
     if (window.navigator.msPointerEnabled) {
@@ -100,27 +104,31 @@ KeyboardInputManager.prototype.listen = function listen() {
   gameContainer.addEventListener(this.eventTouchend, function handleTouchEnd(event) {
     if ((!window.navigator.msPointerEnabled && event.touches.length > 0) ||
         event.targetTouches.length > 0) {
-      return; // Ignore if still touching with one or more fingers
+      return;
     }
 
-    var touchEndClientX, touchEndClientY;
-
-    if (window.navigator.msPointerEnabled) {
-      touchEndClientX = event.pageX;
-      touchEndClientY = event.pageY;
-    } else {
-      touchEndClientX = event.changedTouches[0].clientX;
-      touchEndClientY = event.changedTouches[0].clientY;
-    }
+    var touchEndClientX = window.navigator.msPointerEnabled
+      ? event.pageX
+      : event.changedTouches[0].clientX;
+    var touchEndClientY = window.navigator.msPointerEnabled
+      ? event.pageY
+      : event.changedTouches[0].clientY;
 
     var dx = touchEndClientX - touchStartClientX;
-    var absDx = Math.abs(dx);
-
     var dy = touchEndClientY - touchStartClientY;
+    var absDx = Math.abs(dx);
     var absDy = Math.abs(dy);
 
     if (Math.max(absDx, absDy) > 10) {
-      self.emit("move", absDx > absDy ? (dx > 0 ? 1 : 3) : (dy > 0 ? 2 : 0));
+      var dir = absDx > absDy
+        ? (dx > 0 ? 1 : 3)
+        : (dy > 0 ? 2 : 0);
+
+      // Inverte se checkbox estiver marcado
+      var invert = document.getElementById('invert-controls').checked;
+      dir = invert ? (dir ^ 2) : dir;
+
+      self.emit("move", dir);
     }
   });
 };
