@@ -35,7 +35,9 @@ GameManager.prototype.isGameTerminated = function isGameTerminated() {
 // Set up the game
 GameManager.prototype.setup = function () {
   var previousState = this.storageManager.getGameState();
-  var wasSavedGame = previousState !== null;
+  
+  // Verifica se tem jogo salvo E se o tamanho salvo é igual ao tamanho atual
+  var wasSavedGame = previousState !== null && previousState.grid.size === this.size;
 
   if (wasSavedGame) {
     var savedGrid = previousState.grid;
@@ -50,6 +52,7 @@ GameManager.prototype.setup = function () {
     this.won = gameWon;
     this.keepPlaying = shouldKeepPlaying;
   } else {
+    // Se não tem jogo salvo ou tamanho é diferente, começa novo jogo
     this.grid = new Grid(this.size);
     this.score = 0;
     this.over = false;
@@ -61,6 +64,7 @@ GameManager.prototype.setup = function () {
 
   this.actuate();
 };
+
 
 
 // Set up the initial tiles to start the game with

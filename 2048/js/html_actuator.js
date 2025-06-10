@@ -1,7 +1,7 @@
 function HTMLActuator(gridSize) {
-  this.tileContainer    = document.querySelector(".tile-container");
-  this.scoreContainer   = document.querySelector(".score-container");
-  this.bestContainer    = document.querySelector(".best-container");
+  this.tileContainer = document.querySelector(".tile-container");
+  this.scoreContainer = document.querySelector(".score-container");
+  this.bestContainer = document.querySelector(".best-container");
   this.messageContainer = document.querySelector(".game-message");
 
   this.score = 0;
@@ -50,10 +50,10 @@ HTMLActuator.prototype.addTile = function addTile(tile) {
   var self = this;
 
   var wrapper = document.createElement("div");
-  var inner   = document.createElement("div");
+  var inner = document.createElement("div");
 
   var position = tile.previousPosition || { x: tile.x, y: tile.y };
-  var classes  = ["tile", "tile-" + tile.value];
+  var classes = ["tile", "tile-" + tile.value];
   if (tile.value > 2048) classes.push("tile-super");
 
   this.applyClasses(wrapper, classes);
@@ -64,14 +64,14 @@ HTMLActuator.prototype.addTile = function addTile(tile) {
   this.setPosition(wrapper, position);
 
   if (tile.previousPosition) {
-    window.requestAnimationFrame(function() {
+    window.requestAnimationFrame(function () {
       self.setPosition(wrapper, { x: tile.x, y: tile.y });
     });
   } else if (tile.mergedFrom) {
     classes.push("tile-merged");
     this.applyClasses(wrapper, classes);
 
-    tile.mergedFrom.forEach(function(merged) {
+    tile.mergedFrom.forEach(function (merged) {
       self.addTile(merged);
     });
   } else {
@@ -84,24 +84,40 @@ HTMLActuator.prototype.addTile = function addTile(tile) {
 };
 
 // Define posição lendo variáveis CSS dinâmicas
-HTMLActuator.prototype.setPosition = function(element, position) {
-  var style    = getComputedStyle(document.documentElement);
-  var cellSize = parseFloat(style.getPropertyValue('--tile-size'));
-  var gap      = parseFloat(style.getPropertyValue('--grid-gap'));
-  var x        = position.x;
-  var y        = position.y;
+HTMLActuator.prototype.setPosition = function (element, position) {
+  var style = getComputedStyle(document.documentElement);
+  var cellSize = parseFloat(style.getPropertyValue("--tile-size"));
+  var gap = parseFloat(style.getPropertyValue("--grid-gap"));
+  var x = position.x;
+  var y = position.y;
 
-  var translateX = x * (cellSize + gap);
-  var translateY = y * (cellSize + gap);
+  // Exemplo de deslocamento dinâmico: quanto maior a grid, menor o deslocamento
+  var offsetFactor;
 
-  element.style.transform = "translate(" + translateX + "px, " + translateY + "px)";
+  if (this.gridSize === 4) {
+    offsetFactor = 0.12;  // deslocamento para 4x4
+  } else if (this.gridSize === 5) {
+    offsetFactor = 0.15;   // deslocamento para 5x5 (ajuste conforme visual)
+  } else if (this.gridSize === 6) {
+    offsetFactor = 0.20;   // deslocamento para 6x6
+  } else {
+    offsetFactor = 0.1;    // valor padrão para outros casos
+  }
+
+  var translateX = (x + offsetFactor) * (cellSize + gap);
+  var translateY = (y + offsetFactor) * (cellSize + gap);
+
+  element.style.transform =
+    "translate(" + translateX + "px, " + translateY + "px)";
 };
 
 HTMLActuator.prototype.applyClasses = function applyClasses(element, classes) {
   element.setAttribute("class", classes.join(" "));
 };
 
-HTMLActuator.prototype.normalizePosition = function normalizePosition(position) {
+HTMLActuator.prototype.normalizePosition = function normalizePosition(
+  position
+) {
   return { x: position.x + 1, y: position.y + 1 };
 };
 
@@ -132,7 +148,7 @@ HTMLActuator.prototype.updateBestScore = function updateBestScore(bestScore) {
 };
 
 HTMLActuator.prototype.message = function displayMessage(won) {
-  var type    = won ? "game-won" : "game-over";
+  var type = won ? "game-won" : "game-over";
   var message = won ? "You win!" : "Game over!";
 
   this.messageContainer.classList.add(type);
