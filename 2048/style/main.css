@@ -29,18 +29,6 @@
   z-index: 2;
 }
 
-:root {
-  --tile-size: 110px;
-  --grid-gap: 16px;
-}
-
-.tile {
-  position: absolute;
-  width: var(--tile-size);
-  height: var(--tile-size);
-  transition: transform 100ms ease-in-out;
-}
-
 
 html, body {
   margin: 0;
