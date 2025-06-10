@@ -85,4 +85,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Inicia com a dificuldade padrão (4x4)
   startGame(4);
+
+  // ————— Dark Mode Toggle —————
+  const btnDark = document.getElementById('btn-dark-mode');
+  btnDark.addEventListener('click', () => {
+    document.body.classList.toggle('dark');
+    if (document.body.classList.contains('dark')) {
+      localStorage.setItem('darkMode', '1');
+    } else {
+      localStorage.removeItem('darkMode');
+    }
+  });
+  // Aplica preferência salva ao carregar
+  if (localStorage.getItem('darkMode')) {
+    document.body.classList.add('dark');
+  }
 });

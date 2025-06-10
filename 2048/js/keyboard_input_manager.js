@@ -2,6 +2,12 @@ function KeyboardInputManager() {
   this.events = {};
   this.moveCount = 0; 
 
+  // --- Início das variáveis de tempo ---
+  this.time = 0;
+  this.timerInterval = null;
+  this.startTimer();
+  // --- Fim ---
+
   if (window.navigator.msPointerEnabled) {
     // Internet Explorer 10 style
     this.eventTouchstart    = "MSPointerDown";
@@ -70,6 +76,11 @@ KeyboardInputManager.prototype.listen = function listen() {
   this.bindButtonPress(".restart-button", this.restart);
   this.bindButtonPress(".keep-playing-button", this.keepPlaying);
 
+  // bind dos botões de dificuldade para também disparar o restart do inputManager
+  this.bindButtonPress("#btn-easy", this.restart);
+  this.bindButtonPress("#btn-medium", this.restart);
+  this.bindButtonPress("#btn-hard", this.restart);
+
   // swipe/toque (sem alteração)
   var touchStartClientX, touchStartClientY;
   var gameContainer = document.getElementsByClassName("game-container")[0];
@@ -125,6 +136,8 @@ KeyboardInputManager.prototype.restart = function restart(event) {
   // zera contador
   this.moveCount = 0;
   document.getElementById('move-count').textContent = this.moveCount;
+  // reinicia o timer
+  this.startTimer();
   this.emit("restart");
 };
 
@@ -137,4 +150,32 @@ KeyboardInputManager.prototype.bindButtonPress = function(selector, fn) {
   var button = document.querySelector(selector);
   button.addEventListener("click", fn.bind(this));
   button.addEventListener(this.eventTouchend, fn.bind(this));
+};
+
+KeyboardInputManager.prototype.formatTime = function(seconds) {
+  var mins = Math.floor(seconds / 60);
+  var secs = seconds % 60;
+  return mins + ':' + (secs < 10 ? '0' + secs : secs);
+};
+
+KeyboardInputManager.prototype.startTimer = function() {
+  var self = this;
+  // Reinicia contador de segundos
+  this.time = 0;
+  // Atualiza display imediatamente
+  document.getElementById('time-elapsed').textContent = this.formatTime(this.time);
+  // Limpa intervalo anterior, se existir
+  if (this.timerInterval) clearInterval(this.timerInterval);
+  // Dispara incremento a cada segundo
+  this.timerInterval = setInterval(function() {
+    self.time++;
+    document.getElementById('time-elapsed').textContent = self.formatTime(self.time);
+  }, 1000);
+};
+
+KeyboardInputManager.prototype.stopTimer = function() {
+  if (this.timerInterval) {
+    clearInterval(this.timerInterval);
+    this.timerInterval = null;
+  }
 };

@@ -676,3 +676,67 @@ hr {
 .button-group button:hover {
   background-color: #a3907d;
 }
+
+body.dark {
+  background: #1e1e1e;
+  color: #ddd;
+}
+
+/* Container principal */
+body.dark .container { /* se quiser outro fundo na área branca */
+  /* ex: background: #2b2b2b; */
+}
+
+/* Tabuleiro */
+body.dark .game-container {
+  background: #3a3a3a;
+}
+
+/* Grid de fundo */
+body.dark .grid-cell {
+  background: rgba(60, 58, 50, 0.35);
+}
+
+/* Scores */
+body.dark .score-container,
+body.dark .best-container {
+  background: #555;
+  color: #fff;
+}
+
+/* Botões */
+body.dark .restart-button,
+body.dark .button-group button {
+  background-color: #777;
+  color: #fff;
+}
+
+/* Textos e links */
+body.dark a {
+  color: #bbb;
+}
+
+/* Força texto claro e uma sombra nos tiles */
+body.dark .tile .tile-inner {
+  color: #f9f6f2 !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+}
+
+/* (Opcional) Se quiser diferenciar 2/4 de outros valores: */
+body.dark .tile.tile-2 .tile-inner,
+body.dark .tile.tile-4 .tile-inner {
+  color: #776e65 !important;
+}
+
+body.dark .tile.tile-8  .tile-inner,
+body.dark .tile.tile-16 .tile-inner,
+body.dark .tile.tile-32 .tile-inner,
+body.dark .tile.tile-64 .tile-inner,
+body.dark .tile.tile-128 .tile-inner,
+body.dark .tile.tile-256 .tile-inner,
+body.dark .tile.tile-512 .tile-inner,
+body.dark .tile.tile-1024 .tile-inner,
+body.dark .tile.tile-2048 .tile-inner,
+body.dark .tile.tile-super .tile-inner {
+  color: #f9f6f2 !important;
+}
