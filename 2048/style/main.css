@@ -29,6 +29,35 @@
   z-index: 2;
 }
 
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap; /* para ficar responsivo se precisar */
+}
+
+.controls p.game-intro {
+  margin: 0;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.controls select {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1.5px solid #888;
+  font-size: 16px;
+  background-color: #8f7a66;
+  cursor: pointer;
+  color: white;
+  transition: border-color 0.3s ease;
+}
+
+.controls select:hover,
+.controls select:focus {
+  border-color: black;
+  outline: none;
+}
 
 html, body {
   margin: 0;
@@ -727,4 +756,10 @@ body.dark .tile.tile-1024 .tile-inner,
 body.dark .tile.tile-2048 .tile-inner,
 body.dark .tile.tile-super .tile-inner {
   color: #f9f6f2 !important;
+}
+
+body.dark .controls select {
+  background-color: #666;
+  color: #eee;
+  border: 1.5px solid #666;
 }

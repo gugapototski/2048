@@ -1,15 +1,14 @@
 // Função que retorna o tamanho da grade baseado na dificuldade
 function getGridSize(difficulty) {
   switch (difficulty) {
-    case 'easy':   return 6; // fácil = 6x6
-    case 'medium': return 5; // médio = 5x5
-    case 'hard':   return 4; // difícil = 4x4
+    case 'easy':   return 6;
+    case 'medium': return 5;
+    case 'hard':   return 4;
     default:       return 4;
   }
 }
 
-// Função que monta visualmente a grade no DOM, conforme o tamanho
-// Função que monta visualmente a grade no DOM, conforme o tamanho
+// Função que monta visualmente a grade no DOM
 function buildGridVisual(size) {
   const gap = getGapBySize(size);
   const container = document.querySelector('.grid-container');
@@ -18,12 +17,10 @@ function buildGridVisual(size) {
   const totalWidth = 470;
   const cellSize = (totalWidth - gap * (size - 1)) / size;
 
-  // 1) seta as 3 vars (grid-size, grid-gap e tile-size)
   document.documentElement.style.setProperty('--grid-size', `${size}`);
   document.documentElement.style.setProperty('--grid-gap',  `${gap}px`);
   document.documentElement.style.setProperty('--tile-size', `${cellSize}px`);
 
-  // 2) cria size*size DIVs .grid-cell (sem wrappers de linha)
   for (let i = 0; i < size * size; i++) {
     const cell = document.createElement('div');
     cell.classList.add('grid-cell');
@@ -31,23 +28,33 @@ function buildGridVisual(size) {
   }
 }
 
-
 function getGapBySize(size) {
   switch (size) {
-    case 4: return 15; // 4x4
-    case 5: return 10; // 5x5
-    case 6: return 5;  // 6x6
+    case 4: return 15;
+    case 5: return 10;
+    case 6: return 5;
     default: return 15;
   }
 }
 
-// Variável global para o gameManager
 let gameManager = null;
+let winningValue = 2048;
+let currentDifficulty = 'hard'; // guarda a dificuldade atual
 
-// Função que inicia o jogo com a dificuldade escolhida
-function startGame(size) {
+
+// Atualiza o título grande do jogo
+function updateGameTitle(newTitle) {
+  const titleElement = document.querySelector('h1.title');
+  if (titleElement) {
+    titleElement.textContent = newTitle;
+  }
+}
+
+// Função para iniciar o jogo, recebe o tamanho e condição de vitória
+function startGame(size, winValue = 2048) {
+  winningValue = winValue; // atualiza global
   const gap = getGapBySize(size);
-  buildGridVisual(size, gap);
+  buildGridVisual(size);
 
   if (gameManager && typeof gameManager.clear === 'function') {
     gameManager.clear();
@@ -57,12 +64,39 @@ function startGame(size) {
     size,
     KeyboardInputManager,
     HTMLActuator,
-    LocalStorageManager
+    LocalStorageManager,
+    winningValue
   );
-  console.log(`Jogo iniciado com grade ${size}x${size} e gap ${gap}px`);
+
+  console.log(`Jogo iniciado com grade ${size}x${size}, gap ${gap}px e meta ${winningValue}`);
+
+  updateGameTitle(winningValue); // atualiza título ao iniciar
 }
 
-// Função para trocar a dificuldade e reiniciar o jogo corretamente
+// Função para reiniciar o jogo, usada para centralizar lógica
+function newGame(difficulty, winValue) {
+  currentDifficulty = difficulty;
+  winningValue = winValue;
+
+  // Atualiza a seleção visual dos botões
+  document.querySelectorAll('#btn-easy, #btn-medium, #btn-hard').forEach(btn => {
+    btn.classList.toggle('selected', btn.id === `btn-${difficulty}`);
+  });
+
+  if (gameManager?.storageManager?.clearGameState) {
+    gameManager.storageManager.clearGameState();
+  }
+
+  const size = getGridSize(difficulty);
+  startGame(size, winValue);
+
+  // Chama a função restart para zerar tempo, placar, etc
+  if (typeof restart === 'function') {
+    restart();
+  }
+}
+
+// Função para trocar dificuldade (botões)
 function changeDifficulty(difficulty) {
   const size = getGridSize(difficulty);
 
@@ -71,22 +105,47 @@ function changeDifficulty(difficulty) {
     gameManager.storageManager.clearGameState();
   }
 
-  startGame(size);
+  startGame(size, winningValue);
+
+  updateGameTitle(winningValue);
+
+  // ✅ Simula clique no botão "New Game"
+  document.querySelector('.restart-button')?.click();
 }
 
-// Eventos dos botões de dificuldade
+
+
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('btn-easy')
-    .addEventListener('click', () => changeDifficulty('easy'));
-  document.getElementById('btn-medium')
-    .addEventListener('click', () => changeDifficulty('medium'));
-  document.getElementById('btn-hard')
-    .addEventListener('click', () => changeDifficulty('hard'));
+  // Evento para os botões de dificuldade
+document.getElementById('btn-easy').addEventListener('click', () => {
+  currentDifficulty = 'easy';
+  newGame(currentDifficulty, winningValue);  // <-- isso resolve!
+});
 
-  // Inicia com a dificuldade padrão (4x4)
-  startGame(4);
+document.getElementById('btn-medium').addEventListener('click', () => {
+  currentDifficulty = 'medium';
+  newGame(currentDifficulty, winningValue);
+});
 
-  // ————— Dark Mode Toggle —————
+document.getElementById('btn-hard').addEventListener('click', () => {
+  currentDifficulty = 'hard';
+  newGame(currentDifficulty, winningValue);
+  
+});
+
+
+  // Botão New Game (com classe .restart-button)
+  const restartButton = document.querySelector('.restart-button');
+  if (restartButton) {
+    restartButton.addEventListener('click', () => {
+      newGame(currentDifficulty, winningValue);
+    });
+  }
+
+  // Inicia com dificuldade padrão 'hard' (4x4) e winningValue padrão 2048
+  newGame(currentDifficulty, winningValue);
+
+  // Dark mode toggle
   const btnDark = document.getElementById('btn-dark-mode');
   btnDark.addEventListener('click', () => {
     document.body.classList.toggle('dark');
@@ -96,8 +155,30 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.removeItem('darkMode');
     }
   });
-  // Aplica preferência salva ao carregar
   if (localStorage.getItem('darkMode')) {
     document.body.classList.add('dark');
   }
+
+  // Seletor da condição de vitória
+  const goalSelector = document.getElementById("winning-tile-selector");
+  const goalLabel = document.getElementById("goal-label");
+
+  goalSelector.addEventListener("change", (event) => {
+  const selectedGoal = parseInt(event.target.value, 10);
+  goalLabel.textContent = `${selectedGoal} tile!`;
+
+  winningValue = selectedGoal; // Atualiza a variável global
+
+  if (gameManager?.storageManager?.clearGameState) {
+    gameManager.storageManager.clearGameState();
+  }
+
+  const difficulty = document.querySelector('button.selected')?.id?.replace('btn-', '') || 'hard';
+  const size = getGridSize(difficulty);
+  startGame(size, selectedGoal);
+
+  // ✅ Simula clique no botão "New Game"
+  document.querySelector('.restart-button')?.click();
+});
+
 });

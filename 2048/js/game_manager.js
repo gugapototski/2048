@@ -1,9 +1,10 @@
-function GameManager(size, InputManager, Actuator, StorageManager) {
+function GameManager(size, InputManager, Actuator, StorageManager, winningValue) {
   this.size           = size; // Size of the grid
   this.inputManager   = new InputManager;
   this.storageManager = new StorageManager;
 this.actuator = new Actuator(this.size);
   this.startTiles     = 2;
+  this.WINNING_TILE = winningValue;
 
   this.inputManager.on("move", this.move.bind(this));
   this.inputManager.on("restart", this.restart.bind(this));
@@ -11,8 +12,6 @@ this.actuator = new Actuator(this.size);
 
   this.setup();
 }
-
-GameManager.prototype.WINNING_TILE = 2048;
 
 // Restart the game
 GameManager.prototype.restart = function restartGame() {
