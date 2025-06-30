@@ -1,3 +1,6 @@
+let isImpossibleMode = false; // 1. Adicionar esta variável
+
+
 // Função que retorna o tamanho da grade baseado na dificuldade
 function getGridSize(difficulty) {
   switch (difficulty) {
@@ -51,36 +54,40 @@ function updateGameTitle(newTitle) {
 }
 
 // Função para iniciar o jogo, recebe o tamanho e condição de vitória
-function startGame(size, winValue = 2048) {
-  winningValue = winValue; // atualiza global
-  const gap = getGapBySize(size);
+function startGame(size, winValue = 2048, impossible = false) { // Adicionar parâmetro
+  winningValue = winValue;
   buildGridVisual(size);
 
   if (gameManager && typeof gameManager.clear === 'function') {
     gameManager.clear();
   }
-
+  
+  // 4. Passar o modo para o GameManager
   gameManager = new GameManager(
     size,
     KeyboardInputManager,
     HTMLActuator,
     LocalStorageManager,
-    winningValue
+    winningValue,
+    impossible // Passar o novo parâmetro
   );
 
-  console.log(`Jogo iniciado com grade ${size}x${size}, gap ${gap}px e meta ${winningValue}`);
-
-  updateGameTitle(winningValue); // atualiza título ao iniciar
+  updateGameTitle(winningValue);
 }
 
-// Função para reiniciar o jogo, usada para centralizar lógica
-function newGame(difficulty, winValue) {
+function newGame(difficulty, winValue, impossible = false) { // Adicionar parâmetro
   currentDifficulty = difficulty;
   winningValue = winValue;
 
   // Atualiza a seleção visual dos botões
-  document.querySelectorAll('#btn-easy, #btn-medium, #btn-hard').forEach(btn => {
-    btn.classList.toggle('selected', btn.id === `btn-${difficulty}`);
+  document.querySelectorAll('.button-group button').forEach(btn => {
+    let isSelected = false;
+    if (impossible && btn.id === 'btn-impossible') {
+      isSelected = true;
+    } else if (!impossible && btn.id === `btn-${difficulty}`) {
+      isSelected = true;
+    }
+    btn.classList.toggle('selected', isSelected);
   });
 
   if (gameManager?.storageManager?.clearGameState) {
@@ -88,9 +95,8 @@ function newGame(difficulty, winValue) {
   }
 
   const size = getGridSize(difficulty);
-  startGame(size, winValue);
+  startGame(size, winValue, impossible); // Passar para a função startGame
 
-  // Chama a função restart para zerar tempo, placar, etc
   if (typeof restart === 'function') {
     restart();
   }
@@ -117,21 +123,34 @@ function changeDifficulty(difficulty) {
 
 document.addEventListener('DOMContentLoaded', () => {
   // Evento para os botões de dificuldade
-document.getElementById('btn-easy').addEventListener('click', () => {
-  currentDifficulty = 'easy';
-  newGame(currentDifficulty, winningValue);  // <-- isso resolve!
-});
+ // Modificar os outros botões de dificuldade para desativar o modo impossível
+  document.getElementById('btn-easy').addEventListener('click', () => {
+    currentDifficulty = 'easy';
+    isImpossibleMode = false;
+    document.getElementById('invert-controls').checked = false;
+    newGame(currentDifficulty, winningValue, false);
+  });
 
-document.getElementById('btn-medium').addEventListener('click', () => {
-  currentDifficulty = 'medium';
-  newGame(currentDifficulty, winningValue);
-});
+  document.getElementById('btn-medium').addEventListener('click', () => {
+    currentDifficulty = 'medium';
+    isImpossibleMode = false;
+    document.getElementById('invert-controls').checked = false;
+    newGame(currentDifficulty, winningValue, false);
+  });
 
-document.getElementById('btn-hard').addEventListener('click', () => {
-  currentDifficulty = 'hard';
-  newGame(currentDifficulty, winningValue);
-  
-});
+  document.getElementById('btn-hard').addEventListener('click', () => {
+    currentDifficulty = 'hard';
+    isImpossibleMode = false;
+    document.getElementById('invert-controls').checked = false;
+    newGame(currentDifficulty, winningValue, false);
+  });
+
+  document.getElementById('btn-impossible').addEventListener('click', () => {
+    currentDifficulty = 'hard'; 
+    isImpossibleMode = true;
+    document.getElementById('invert-controls').checked = true; 
+    newGame(currentDifficulty, winningValue, true);
+  });
 
 
   // Botão New Game (com classe .restart-button)

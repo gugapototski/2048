@@ -1,4 +1,5 @@
 @import url(fonts/clear-sans.css);
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap');
 /* == GRID DINÂMICA dentro de .game-container == */
 .game-container .grid-container {
   display: grid;
@@ -64,8 +65,9 @@ html, body {
   padding: 0;
   background: #faf8ef;
   color: #776e65;
-  font-family: "Clear Sans", "Helvetica Neue", Arial, sans-serif;
-  font-size: 18px; }
+  font-family: 'Montserrat', sans-serif;
+  font-size: 18px; 
+}
 
 body {
   margin: 80px 0; }
@@ -762,4 +764,19 @@ body.dark .controls select {
   background-color: #666;
   color: #eee;
   border: 1.5px solid #666;
+}
+
+/* Estilo para o botão de modo impossível quando selecionado */
+.button-group button#btn-impossible.selected {
+  background-color: #d1452e; /* Uma cor de destaque, como vermelho */
+  box-shadow: 0 0 5px #d1452e;
+}
+
+/* Estilo para o bloco fixo */
+.tile.tile-blocked .tile-inner {
+  background: #3c3a32; /* Cor escura e sólida */
+  color: #f9f6f2;
+  font-size: 55px;
+  font-weight: bold;
+  cursor: not-allowed; /* Indica que não é clicável/movível */
 }

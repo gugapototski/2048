@@ -1,10 +1,11 @@
-function GameManager(size, InputManager, Actuator, StorageManager, winningValue) {
-  this.size           = size; // Size of the grid
-  this.inputManager   = new InputManager;
+function GameManager(size, InputManager, Actuator, StorageManager, winningValue, isImpossible) {
+  this.size = size;
+  this.inputManager = new InputManager;
   this.storageManager = new StorageManager;
-this.actuator = new Actuator(this.size);
-  this.startTiles     = 2;
+  this.actuator = new Actuator(this.size);
+  this.startTiles = 2;
   this.WINNING_TILE = winningValue;
+  this.isImpossible = isImpossible || false; // Armazena o modo
 
   this.inputManager.on("move", this.move.bind(this));
   this.inputManager.on("restart", this.restart.bind(this));
@@ -12,6 +13,28 @@ this.actuator = new Actuator(this.size);
 
   this.setup();
 }
+
+GameManager.prototype.addBlockedTile = function () {
+  // Funciona para grades de tamanho par (como 4x4 ou 6x6)
+  if (this.size % 2 === 0) {
+    var x = this.size / 2 - 1;
+    var y = this.size / 2 - 1;
+    
+    // Para garantir que o bloco não fique sempre no mesmo canto, podemos sortear uma das 4 posições centrais
+    const centralCells = [
+        { x: x, y: y },
+        { x: x + 1, y: y },
+        { x: x, y: y + 1 },
+        { x: x + 1, y: y + 1 },
+    ];
+    const randomCentralCell = centralCells[Math.floor(Math.random() * centralCells.length)];
+
+    // Usamos um valor não numérico para identificar o bloco
+    var blockedTile = new Tile(randomCentralCell, "X"); 
+    blockedTile.blocked = true; // Propriedade especial para identificação
+    this.grid.insertTile(blockedTile);
+  }
+};
 
 // Restart the game
 GameManager.prototype.restart = function restartGame() {
@@ -31,12 +54,10 @@ GameManager.prototype.isGameTerminated = function isGameTerminated() {
   return this.over || (this.won && !this.keepPlaying);
 };
 
-// Set up the game
+
 GameManager.prototype.setup = function () {
   var previousState = this.storageManager.getGameState();
-  
-  // Verifica se tem jogo salvo E se o tamanho salvo é igual ao tamanho atual
-  var wasSavedGame = previousState !== null && previousState.grid.size === this.size;
+  var wasSavedGame = previousState !== null && previousState.grid.size === this.size && previousState.isImpossible === this.isImpossible;
 
   if (wasSavedGame) {
     var savedGrid = previousState.grid;
@@ -51,13 +72,17 @@ GameManager.prototype.setup = function () {
     this.won = gameWon;
     this.keepPlaying = shouldKeepPlaying;
   } else {
-    // Se não tem jogo salvo ou tamanho é diferente, começa novo jogo
     this.grid = new Grid(this.size);
     this.score = 0;
     this.over = false;
     this.won = false;
     this.keepPlaying = false;
-
+    
+    // Adiciona o bloco fixo se estiver no modo impossível
+    if (this.isImpossible) {
+      this.addBlockedTile();
+    }
+    
     this.addStartTiles();
   }
 
@@ -111,7 +136,8 @@ GameManager.prototype.serialize = function serializeGame() {
     score:       this.score,
     over:        this.over,
     won:         this.won,
-    keepPlaying: this.keepPlaying
+    keepPlaying: this.keepPlaying,
+    isImpossible: this.isImpossible // Adicione esta linha
   };
 };
 
@@ -148,11 +174,13 @@ GameManager.prototype.move = function (direction) {
       var cell = { x: x, y: y };
       var tile = self.grid.cellContent(cell);
 
-      if (tile) {
+      // A alteração está aqui: !tile.blocked
+      if (tile && !tile.blocked) { 
         var positions = self.findFarthestPosition(cell, self.getVector(direction));
         var next = self.grid.cellContent(positions.next);
-
-        if (self.canMerge(tile, next)) {
+        
+        // A alteração está aqui: !next.blocked
+        if (self.canMerge(tile, next) && !next.blocked) {
           self.mergeTiles(tile, next, positions.next);
         } else {
           self.moveTile(tile, positions.farthest);

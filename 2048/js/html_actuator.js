@@ -53,7 +53,8 @@ HTMLActuator.prototype.addTile = function addTile(tile) {
   var inner = document.createElement("div");
 
   var position = tile.previousPosition || { x: tile.x, y: tile.y };
-  var classes = ["tile", "tile-" + tile.value];
+   // Adiciona a classe 'tile-blocked' se a propriedade existir
+  var classes = tile.blocked ? ["tile", "tile-blocked"] : ["tile", "tile-" + tile.value];
   if (tile.value > 2048) classes.push("tile-super");
 
   this.applyClasses(wrapper, classes);
