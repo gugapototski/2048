@@ -1,5 +1,11 @@
 let isImpossibleMode = false; // 1. Adicionar esta variável
 
+function displayTimeRanking() {
+  if (gameManager) {
+    var ranking = gameManager.storageManager.getTimeRanking();
+    gameManager.actuator.updateTimeRanking(ranking);
+  }
+}
 
 // Função que retorna o tamanho da grade baseado na dificuldade
 function getGridSize(difficulty) {
@@ -100,6 +106,9 @@ function newGame(difficulty, winValue, impossible = false) { // Adicionar parâm
   if (typeof restart === 'function') {
     restart();
   }
+
+    displayTimeRanking();
+
 }
 
 // Função para trocar dificuldade (botões)
@@ -199,5 +208,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // ✅ Simula clique no botão "New Game"
   document.querySelector('.restart-button')?.click();
 });
+
+  displayTimeRanking(); 
+
 
 });

@@ -179,3 +179,15 @@ KeyboardInputManager.prototype.stopTimer = function() {
     this.timerInterval = null;
   }
 };
+
+// Adicione estas duas funções no final do arquivo
+KeyboardInputManager.prototype.stopTimer = function() {
+  if (this.timerInterval) {
+    clearInterval(this.timerInterval);
+    this.timerInterval = null;
+  }
+};
+
+KeyboardInputManager.prototype.getTime = function() {
+    return this.time;
+}

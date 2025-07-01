@@ -780,3 +780,58 @@ body.dark .controls select {
   font-weight: bold;
   cursor: not-allowed; /* Indica que não é clicável/movível */
 }
+
+.time-ranking-container {
+  background: #bbada0;
+  border-radius: 6px;
+  padding: 15px 20px;
+  margin-top: 20px;
+  color: #f9f6f2;
+}
+
+.time-ranking-container h3 {
+  margin-top: 0;
+  text-align: center;
+}
+
+.time-ranking-container ol {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.time-ranking-container li {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 5px;
+  border-bottom: 1px solid rgba(238, 228, 218, 0.5);
+  font-weight: bold;
+}
+
+.time-ranking-container li:last-child {
+  border-bottom: none;
+}
+
+.time-ranking-container .rank-position {
+  flex-basis: 10%;
+}
+.time-ranking-container .rank-time {
+  flex-basis: 40%;
+  text-align: center;
+}
+.time-ranking-container .rank-date {
+  flex-basis: 50%;
+  text-align: right;
+  font-size: 0.9em;
+  opacity: 0.8;
+}
+
+/* Adaptação para o Modo Escuro */
+body.dark .time-ranking-container {
+  background: #3a3a3a;
+  color: #ddd;
+}
+
+body.dark .time-ranking-container li {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}

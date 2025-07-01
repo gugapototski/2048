@@ -218,7 +218,15 @@ GameManager.prototype.mergeTiles = function (tile, next, position) {
   tile.updatePosition(position);
   this.score += merged.value;
 
-  if (merged.value === this.WINNING_TILE) this.won = true;
+  if (merged.value === this.WINNING_TILE && !this.won) { // adicione !this.won para registrar apenas uma vez
+    this.won = true;
+    
+    // --- INÍCIO DA LÓGICA DO RANKING ---
+    this.inputManager.stopTimer();
+    var finalTime = this.inputManager.getTime();
+    this.storageManager.addTimeToRanking(finalTime);
+    // --- FIM DA LÓGICA DO RANKING ---
+  }
 };
 
 // Get the vector representing the chosen direction

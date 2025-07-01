@@ -160,3 +160,42 @@ HTMLActuator.prototype.clearMessage = function clearMessage() {
   this.messageContainer.classList.remove("game-won");
   this.messageContainer.classList.remove("game-over");
 };
+
+HTMLActuator.prototype.updateTimeRanking = function (ranking) {
+  var listContainer = document.getElementById("time-ranking-list");
+  listContainer.innerHTML = ""; // Limpa a lista antiga
+
+  if (ranking.length === 0) {
+    listContainer.innerHTML = "<li>Nenhum recorde ainda. Jogue para marcar seu tempo!</li>";
+    return;
+  }
+  
+  // Função para formatar o tempo de segundos para "M:SS"
+  var formatTime = function(seconds) {
+    var mins = Math.floor(seconds / 60);
+    var secs = seconds % 60;
+    return mins + ':' + (secs < 10 ? '0' + secs : secs);
+  };
+
+  ranking.forEach(function(entry, index) {
+    var listItem = document.createElement("li");
+    
+    var posSpan = document.createElement("span");
+    posSpan.className = "rank-position";
+    posSpan.textContent = "#" + (index + 1);
+
+    var timeSpan = document.createElement("span");
+    timeSpan.className = "rank-time";
+    timeSpan.textContent = formatTime(entry.time);
+    
+    var dateSpan = document.createElement("span");
+    dateSpan.className = "rank-date";
+    dateSpan.textContent = entry.date;
+    
+    listItem.appendChild(posSpan);
+    listItem.appendChild(timeSpan);
+    listItem.appendChild(dateSpan);
+    
+    listContainer.appendChild(listItem);
+  });
+};
