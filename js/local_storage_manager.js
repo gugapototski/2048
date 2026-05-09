@@ -21,7 +21,8 @@ window.fakeStorage = {
 function LocalStorageManager() {
   this.bestScoreKey = "bestScore";
   this.gameStateKey = "gameState";
-
+  this.timeRankingKey = "timeRanking"; // 1. Adicione esta linha
+  
   var supported = this.localStorageSupported();
   this.storage = supported ? window.localStorage : window.fakeStorage;
 }
@@ -60,4 +61,28 @@ LocalStorageManager.prototype.setGameState = function setGameState(gameState) {
 
 LocalStorageManager.prototype.clearGameState = function clearGameState() {
   this.storage.removeItem(this.gameStateKey);
+};
+
+LocalStorageManager.prototype.getTimeRanking = function () {
+  var rankingJSON = this.storage.getItem(this.timeRankingKey);
+  return rankingJSON ? JSON.parse(rankingJSON) : [];
+};
+
+LocalStorageManager.prototype.addTimeToRanking = function (timeInSeconds) {
+  var ranking = this.getTimeRanking();
+  
+  // Adiciona o novo tempo com a data atual
+  ranking.push({
+    time: timeInSeconds,
+    date: new Date().toLocaleDateString() 
+  });
+  
+  // Ordena por tempo (menor primeiro)
+  ranking.sort((a, b) => a.time - b.time);
+  
+  // Mantém apenas os 5 melhores
+  var top5 = ranking.slice(0, 5);
+  
+  // Salva de volta no localStorage
+  this.storage.setItem(this.timeRankingKey, JSON.stringify(top5));
 };
